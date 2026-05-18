@@ -95,7 +95,7 @@ Private Sub B4XPage_CloseRequest As ResumableSub
 	End If
 	
 	If btnOpen.Text = "Close" Then
-		btnOpen_Click
+		CloseUSBTTL
 	End If
 
 	Return True
@@ -339,74 +339,80 @@ End Sub
 Private Sub btnOpen_Click	
 	' Open Port
 	If btnOpen.Text = "Open" Then
-		If cmbBaudMode.SelectedIndex = -1 Then
-			xui.Msgbox2Async("Select Baud to open from list", "Baud Required", "Ok", "", "", Null)
-			Return
-		End If
-		
-		Dim serial1 As Serial
-		serial1.Initialize("serial1")
-		
-		Dim UseBaud As Int
-		Dim getBaudValue As String = cmbBaudMode.Items.Get(cmbBaudMode.SelectedIndex)
-		Select Case getBaudValue
-			Case "1200": 	UseBaud = serial1.BAUDRATE_1200
-			Case "2400": 	UseBaud = serial1.BAUDRATE_2400
-			Case "4800": 	UseBaud = serial1.BAUDRATE_4800
-			Case "9600": 	UseBaud = serial1.BAUDRATE_9600
-			Case "19200": 	UseBaud = serial1.BAUDRATE_19200
-			Case "38400": 	UseBaud = serial1.BAUDRATE_38400
-			Case "57600": 	UseBaud = serial1.BAUDRATE_57600
-			Case "115200": 	UseBaud = serial1.BAUDRATE_115200
-			Case Else:  	UseBaud = serial1.BAUDRATE_9600
-		End Select
-		
-		LogMessage("Status", "AT Mode Baud = " & getBaudValue )
-		
-		Try
-			serial1.Open(cmbPort.Value)
-			serial1.SetParams(UseBaud, serial1.DATABITS_8, serial1.STOPBITS_1, serial1.PARITY_NONE) 
-			If astream.IsInitialized Then astream.Close
-			astream.Initialize(serial1.GetInputStream, serial1.GetOutputStream, "astream")
-			serialATMode = serial1
-		Catch
-			LogMessage("Status", "Error opening port" & LastException)
-			Return
-		End Try
-
-		cmbBaud.Enabled = True
-		btnSetBaud.Enabled = True
-		btnSetDeviceName.Enabled = True
-		btnQueryBaud.Enabled = True
-		btnQueryName.Enabled = True
-		cmbBaudMode.Enabled = False
-		cmbPort.Enabled = False
-		btnSend.Enabled = True
-		cmbListATCommand.Enabled = True
-		btnOpen.Text = "Close"
-		
-		LogMessage("Status", "Serial COM opened")
+		OpenUSBTTL
 		
 	' Close Port
 	Else
-		If astream.IsInitialized Then
-			astream.Close
-			serialATMode.Close
-		End If
-		
-		cmbBaud.Enabled = False
-		btnSetBaud.Enabled = False
-		btnSetDeviceName.Enabled = False
-		btnQueryBaud.Enabled = False
-		btnQueryName.Enabled = False
-		cmbBaudMode.Enabled = True
-		cmbPort.Enabled = True
-		btnSend.Enabled = False
-		cmbListATCommand.Enabled = False
-		btnOpen.Text = "Open"
-
-		LogMessage("Status", "Serial COM closed")
+		CloseUSBTTL
 	End If
+End Sub
+Sub OpenUSBTTL
+	If cmbBaudMode.SelectedIndex = -1 Then
+		xui.Msgbox2Async("Select Baud to open from list", "Baud Required", "Ok", "", "", Null)
+		Return
+	End If
+		
+	Dim serial1 As Serial
+	serial1.Initialize("serial1")
+		
+	Dim UseBaud As Int
+	Dim getBaudValue As String = cmbBaudMode.Items.Get(cmbBaudMode.SelectedIndex)
+	Select Case getBaudValue
+		Case "1200": 	UseBaud = serial1.BAUDRATE_1200
+		Case "2400": 	UseBaud = serial1.BAUDRATE_2400
+		Case "4800": 	UseBaud = serial1.BAUDRATE_4800
+		Case "9600": 	UseBaud = serial1.BAUDRATE_9600
+		Case "19200": 	UseBaud = serial1.BAUDRATE_19200
+		Case "38400": 	UseBaud = serial1.BAUDRATE_38400
+		Case "57600": 	UseBaud = serial1.BAUDRATE_57600
+		Case "115200": 	UseBaud = serial1.BAUDRATE_115200
+		Case Else:  	UseBaud = serial1.BAUDRATE_9600
+	End Select
+	
+	LogMessage("Status", "AT Mode Baud = " & getBaudValue )
+	
+	Try
+		serial1.Open(cmbPort.Value)
+		serial1.SetParams(UseBaud, serial1.DATABITS_8, serial1.STOPBITS_1, serial1.PARITY_NONE)
+		If astream.IsInitialized Then astream.Close
+		astream.Initialize(serial1.GetInputStream, serial1.GetOutputStream, "astream")
+		serialATMode = serial1
+	Catch
+		LogMessage("Status", "Error opening port" & LastException)
+		Return
+	End Try
+	
+	cmbBaud.Enabled = True
+	btnSetBaud.Enabled = True
+	btnSetDeviceName.Enabled = True
+	btnQueryBaud.Enabled = True
+	btnQueryName.Enabled = True
+	cmbBaudMode.Enabled = False
+	cmbPort.Enabled = False
+	btnSend.Enabled = True
+	cmbListATCommand.Enabled = True
+	btnOpen.Text = "Close"
+	
+	LogMessage("Status", "Serial COM opened")
+End Sub
+Sub CloseUSBTTL
+	If astream.IsInitialized Then
+		astream.Close
+		serialATMode.Close
+	End If
+		
+	cmbBaud.Enabled = False
+	btnSetBaud.Enabled = False
+	btnSetDeviceName.Enabled = False
+	btnQueryBaud.Enabled = False
+	btnQueryName.Enabled = False
+	cmbBaudMode.Enabled = True
+	cmbPort.Enabled = True
+	btnSend.Enabled = False
+	cmbListATCommand.Enabled = False
+	btnOpen.Text = "Open"
+
+	LogMessage("Status", "Serial COM closed")
 End Sub
 
 Private Sub cmbPort_SelectedIndexChanged(Index As Int, Value As Object)

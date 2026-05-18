@@ -32,7 +32,7 @@ Version=9.85
 'Ctrl + click to export as zip: ide://run?File=%B4X%\Zipper.jar&Args=Project.zip
 
 Sub Class_Globals
-	Private Const VERSION As String = "12.52"
+	Private Const VERSION As String = "12.53"
 	
 	Private Const CONFIG_MAP As String = "config.map"		' For ESP32 Uploader
 	Private Const FLASH_BIN As String = "flash.bin"			' For ESP32 Uploader
@@ -52,7 +52,7 @@ Sub Class_Globals
 	Private Const BUTTON_TTLSERIAL As Int = 6
 	Private Const BUTTON_STOP As Int = 7
 	
-	' If Button labels need changing, update them here, too!
+	' If Button labels need changing, update them here!
 	Private Const txt_CONNECT As String = "Connect"
 	Private Const txt_DISCONNECT As String = "Disconnect"
 	Private Const txt_OPEN_PORT As String = "Open Port"
@@ -232,6 +232,14 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	jo.RunMethod("setPromptText", Array("Choose Port"))
 	Dim jo As JavaObject = cmbPicList
 	jo.RunMethod("setPromptText", Array("PIC List"))
+	
+	' No need to update them at IDE!
+	btnConnectHC05.Text = txt_CONNECT
+	btnConnectHM10.Text = txt_CONNECT
+	btnConnectWIFI.Text = txt_CONNECT
+	btnOpenUSBTTL.Text = txt_OPEN_PORT
+	btnFlash.Text = txt_FLASH
+	
 End Sub
 Private Sub B4XPage_CloseRequest As ResumableSub
 	
@@ -717,12 +725,12 @@ Private Sub cmbPortUSBTTL_SelectedIndexChanged(Index As Int, Value As Object)
 End Sub
 Private Sub btnOpenUSBTTL_Click
 	If btnOpenUSBTTL.Text = txt_OPEN_PORT Then
-		OpenUSBTLL
+		OpenUSBTTL
 	Else
 		PerformUserAbort(BUTTON_TTLSERIAL, WhichDeviceConnection, False)
 	End If
 End Sub
-Private Sub OpenUSBTLL
+Private Sub OpenUSBTTL
 	If CloseOtherConnection(WhichDeviceConnection)  = True Then
 		Sleep(500)	' Min 400 ms. Let other open connection close properly!
 	End If
@@ -1614,7 +1622,7 @@ Sub LoadConfiguration(SelectedPicName As String) As Boolean
 						If WhichDeviceConnection = DEVICE_TTLSERIAL Then
 							LogMessage("Status", "Reapplying Parameters to Serial Com")
 							PerformUserAbort(BUTTON_TTLSERIAL, WhichDeviceConnection, False) ' close
-							OpenUSBTLL ' open
+							OpenUSBTTL ' open
 						End If
 						
 						LogMessage("", "---------------------------------------------------------")
