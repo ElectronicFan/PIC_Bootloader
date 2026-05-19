@@ -14,7 +14,7 @@
 
 #define LED_PIN   LATBbits.LATB3            // Use LAT for Output
 #define LED_TRIS  TRISBbits.TRISB3
-#define TIMER2_COUNT 124                    // 2s  
+#define TIMER2_COUNT 186                    // 3s  
 
 uint8_t t2_counter = 0;                     // For Timer2 ISR counter (16 ms trigger ISR function)
 
@@ -93,8 +93,8 @@ void __at(0x1F000) App_ISR(void)
          * Timer2 Settings: Prescaler 1:128, Postscaler 1:16, PR2 = 124
          * Interrupt Time = Tcy * Prescale * (PR2 + 1) * Postscale
          * 62.5ns * 128 * 125 * 16 = 0.016s (16ms per interrupt)
-         * To get 2.0s: 2.0s / 0.01s = 124 counts
-         * Set TIMER2_COUNT to 124
+         * To get 3.0s: 3.0s / 0.01s = 186 counts
+         * Set TIMER2_COUNT to 186
          */
         
         if (t2_counter >= TIMER2_COUNT)      
