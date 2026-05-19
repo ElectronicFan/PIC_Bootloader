@@ -99,7 +99,7 @@ void __at(0x1F000) App_ISR(void)
         if (t2_counter >= TIMER2_COUNT)      
         {
             t2_counter = 0;           // Reset it
-            //UART_TxString("<Application Timer 2S>"); // Enable DEMO
+            //UART_TxString("<Application Timer 3S>"); // Enable DEMO
         }
     }
 }
