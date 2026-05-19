@@ -248,13 +248,7 @@ void Flash_Verify(void)
         }       
         if (flashSettings.isVerify_Checksum == false)
         {
-            // WIFI DT06 requires higher delay or will cause issues!
-            if (flashSettings.WhichDevice == DEVICE_WIFI) 
-            {
-                __delay_ms(100);     // tested min 100ms ok.  Disappointing! Maybe improve the custom DT06 rom?   
-            } else {
-                __delay_ms(1);
-            }  
+            __delay_ms(1);
         // No Delay for checksum result.
         }
     }
