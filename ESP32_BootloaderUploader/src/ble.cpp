@@ -8,6 +8,7 @@ bool doScan = true;
 String rxBufferString;
 File verifyFile;
 uint16_t intMTUSize = 20;                         
+uint8_t intVerifyTotalChecksum = 0;                            
 
 // Shared variables (extern from header)
 NimBLEAdvertisedDevice* myDevice = nullptr;
@@ -107,11 +108,6 @@ class MyAdvertisedDeviceCallbacks : public NimBLEScanCallbacks
 //-----------------------------------------------------------
 static void notifyCallback(NimBLERemoteCharacteristic* pRemoteCharacteristic, uint8_t* pData, size_t length, bool isNotify) 
 {
-    //Serial.print("Notify callback for characteristic ");
-    //Serial.print(pRemoteCharacteristic->getUUID().toString().c_str());
-    //Serial.print(" of data length ");
-    //Serial.println(length);
-    //Serial.print("data: ");
     // NimBLE is very efficient; pData points directly to the received buffer
     //Serial.write(pData, length);
     //Serial.println();
@@ -221,7 +217,8 @@ void setMTUSize(uint16_t RawMTU)
     // Bitwise AND with 0xFFFC clears the last two bits
     int UniversalMTU = PayloadMTU & 0xFFFC; 
     
-    if (UniversalMTU > 0) {
+    if (UniversalMTU > 0) 
+    {
         intMTUSize = (uint16_t)UniversalMTU;
     }
 
@@ -300,38 +297,48 @@ void handleMessage(String msg, uint8_t* rawBytes, size_t length)
 
     // Check if we are in Verification Mode (we know this because PIC will start sending raw bytes instead of messages, but it will still send a message to trigger the start of verify mode)
     if (myPicStatus.blnStartFlashVerify == true) {
-        myPicStatus.cntVerify += length;
 
-        // Check for completion based on byte count 
-        if (myPicStatus.cntVerify >= myConfig.intExpectedFirmwareBytes)
+        if (myConfig.blnUseCheckSum == true)
         {
-            // Without this, Last iteration will cause issues! Due to low 150ms delay in PIC after msg send!
             myPicStatus.blnStartFlashVerify = false;
-            // we let <EndFlashVerify> handle the UI transition.
-            Serial.println("STATUS: All verify bytes received.");
-        }
+            if (length == 1) 
+            {
+                intVerifyTotalChecksum = rawBytes[0];
+            }
 
-        // Append incoming bytes directly to SD to save RAM
-        if (verifyFile)
-        {
-            verifyFile.write(rawBytes, length);
-        }
-
-        //if ((myPicStatus.blnUserCancel == true) && (currentMenu != FIRMWARESTART))
-        if (myPicStatus.blnUserCancel == true)
-        {
-            // Can't do much with verify when its going.  it has to exhaust all sent bytes from PIC.
-            // Currently, no shutting off Verify_Flash!!
-            return;
         } else {
-            // Update progress bar
-            float progress = (float)myPicStatus.cntVerify / myConfig.intExpectedFirmwareBytes;
-            updateProgressBar(progress);
+            myPicStatus.cntVerify += length;
 
-            // Update total bytes
-            updateVerifyBytesLabel();
+            // Check for completion based on byte count 
+            if (myPicStatus.cntVerify >= myConfig.intExpectedFirmwareBytes)
+            {
+                // Without this, Last iteration will cause issues! Due to low 150ms delay in PIC after msg send!
+                myPicStatus.blnStartFlashVerify = false;
+                // we let <EndFlashVerify> handle the UI transition.
+                Serial.println("STATUS: All verify bytes received.");
+            }
+
+            // Append incoming bytes directly to SD to save RAM
+            if (verifyFile)
+            {
+                verifyFile.write(rawBytes, length);
+            }
+
+            //if ((myPicStatus.blnUserCancel == true) && (currentMenu != FIRMWARESTART))
+            if (myPicStatus.blnUserCancel == true)
+            {
+                // Can't do much with verify when its going.  it has to exhaust all sent bytes from PIC.
+                // Currently, no shutting off Verify_Flash!!
+                return;
+            } else {
+                // Update progress bar
+                float progress = (float)myPicStatus.cntVerify / myConfig.intExpectedFirmwareBytes;
+                updateProgressBar(progress);
+
+                // Update total bytes
+                updateVerifyBytesLabel();
+            }
         }
-
     // Handle PIC System Messages
     } else {
         if (msg.indexOf("<HandShakeTimeout>") > -1)
@@ -378,11 +385,14 @@ void handleMessage(String msg, uint8_t* rawBytes, size_t length)
             myPicStatus.cntVerify = 0;
             myPicStatus.blnStartFlashVerify = true;
             if (verifyFile) 
-			{
+            {
                 verifyFile.close();
-			    verifyFile = File();
-			}
-			SD.remove(VERIFY_FILE);
+                verifyFile = File();                                // Important: Zero out the file object so we don't use it again
+            }
+            if (SD.exists(VERIFY_FILE)) 
+            {
+                SD.remove(VERIFY_FILE);
+            }
             verifyFile = SD.open(VERIFY_FILE, FILE_WRITE);          // OPEN ONCE AND APPEND ALL BYTES TO IT.  This is to save RAM since we are receiving bytes in chunks and not as a whole file.
             Serial.println("STATUS: Waiting for verification...");
         }
@@ -392,9 +402,15 @@ void handleMessage(String msg, uint8_t* rawBytes, size_t length)
             if (verifyFile) 
             {
                 verifyFile.close();
-                verifyFile = File();                                // Important: Zero out the file object so we don't use it again
+                verifyFile = File();                                    // Important: Zero out the file object so we don't use it again
             }
-            verifyStatus();                                         // Display the result on your ILI9488 UI (you will need to implement this function in sdcard.cpp or wherever you want since it just needs to read the VERIFY_FILE and compare it to flash.bin)
+            if (myConfig.blnUseCheckSum == true)
+            {
+                verifyStatusCheckSum();                                 // Display the result on your ILI9488 UI (you will need to implement this function in sdcard.cpp or wherever you want since it just needs to read the VERIFY_FILE and compare it to flash.bin and also compare the checksum) 
+            } else {
+                verifyStatus();                                         // Display the result on your ILI9488 UI (you will need to implement this function in sdcard.cpp or wherever you want since it just needs to read the VERIFY_FILE and compare it to flash.bin)
+            }
+           
         }
     }
 

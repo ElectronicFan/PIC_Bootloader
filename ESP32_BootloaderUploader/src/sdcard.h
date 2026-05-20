@@ -5,6 +5,7 @@
 
 void initSDSystem();
 void verifyStatus();
+void verifyStatusCheckSum();
 bool compareFiles(const char* path1, const char* path2);
 String GetConfigInfo();
 

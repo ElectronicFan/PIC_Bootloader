@@ -22,6 +22,7 @@ struct ConfigMap {
     bool     blnUseWriteBurst;
     bool     blnUseDoubleHexAddr;
     bool     blnUse4Padding;
+    bool     blnUseCheckSum;
     String   strPicName;
     String   strNotes;
 };

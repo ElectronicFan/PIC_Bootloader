@@ -1,6 +1,7 @@
 #include "globals.h"
 #include "sdcard.h"
 #include "display_logic.h"
+#include "ble.h"
 
 ConfigMap myConfig;
 const char* FLASH_FILE = "/flash.bin"; 
@@ -33,6 +34,33 @@ void verifyStatus()
     } else {
         updateCriticalLabel("Failed!", false);
         Serial.println("File not same!!!");
+    }
+}
+
+void verifyStatusCheckSum()
+{
+    File flashFile = SD.open(FLASH_FILE, FILE_READ);
+    if (!flashFile) 
+    {
+        Serial.println("Failed to open verify file for checksum!");
+        updateCriticalLabel("Verify file error!", false);
+        return;
+    }
+
+    uint8_t calculatedChecksum = 0;
+    while (flashFile.available()) 
+    {
+        calculatedChecksum += flashFile.read();
+    }
+    flashFile.close();
+
+    if (calculatedChecksum == intVerifyTotalChecksum) 
+    {
+        updateCriticalLabel("Passed!", true);
+        Serial.println("Checksum Success!!!");
+    } else {
+        updateCriticalLabel("Failed!", false);
+        Serial.println("Checksum Failed!!!");
     }
 }
 
@@ -121,6 +149,7 @@ String GetConfigInfo()
         else if (key == "UseWriteBurst")    myConfig.blnUseWriteBurst = (val == "true");
         else if (key == "UseDoubleHexAddr") myConfig.blnUseDoubleHexAddr = (val == "true");
         else if (key == "Use4Padding")      myConfig.blnUse4Padding = (val == "true");
+        else if (key == "UseCheckSum")      myConfig.blnUseCheckSum = (val == "true");
     }
 
     configFile.close();

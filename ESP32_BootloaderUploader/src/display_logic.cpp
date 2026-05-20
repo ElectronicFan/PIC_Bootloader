@@ -200,13 +200,17 @@ void drawFlashMenu()
             sprintf(buffer, "Burst: [%s]", myConfig.blnUseWriteBurst ? "ON" : "OFF");
             tft.drawString(buffer, 10, 145, 2);
 
-            // 2. DoubleHex (Moved to 160 for better spacing on the 480px width)
+            // 2. DoubleHex (Moved to 100 for better spacing on the 480px width)
             sprintf(buffer, "DoubleHex: [%s]", myConfig.blnUseDoubleHexAddr ? "ON" : "OFF");
-            tft.drawString(buffer, 160, 145, 2);
+            tft.drawString(buffer, 100, 145, 2);
 
-            // 3. 4Padding (Moved to 320 to keep the columns even)
+            // 3. 4Padding (Moved to 220 for better spacing on the 480px width)
             sprintf(buffer, "4Padding: [%s]", myConfig.blnUse4Padding ? "ON" : "OFF");
-            tft.drawString(buffer, 320, 145, 2);
+            tft.drawString(buffer, 220, 145, 2);
+
+            // 4. CheckSum  (Moved to 340 for better spacing on the 480px width)
+            sprintf(buffer, "CheckSum: [%s]", myConfig.blnUseCheckSum ? "ON" : "OFF");
+            tft.drawString(buffer, 340, 145, 2);
 
             // Notes Section
             // 1. Draw Separator Line
@@ -320,7 +324,7 @@ void drawAboutMenu()
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.drawCentreString("ABOUT", 240, 20, 4);
     tft.drawString("Author: First Last", 5, 80, 2);
-    tft.drawString("Firmware: v2.17", 5, 100, 2);
+    tft.drawString("Firmware: v2.19", 5, 100, 2);
     tft.drawString("Product: PIC Uploader", 5, 120, 2);
     tft.drawString("Hardware: ESP32 + ILI9488 + SD", 5, 140, 2);
     drawBackButton();

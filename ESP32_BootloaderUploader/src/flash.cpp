@@ -115,7 +115,12 @@ void sendConfigBytes()
     byteTHREE[0] = (uint8_t)(intMTUSize & 0x00FF);
 
     // 4. Set the Flash Type
-    byteFOUR[0] = (uint8_t)(0x00);
+    if (myConfig.blnUseCheckSum == true)
+    {
+        byteFOUR[0] = (uint8_t)0x01;   // Checksum mode
+    } else {
+        byteFOUR[0] = (uint8_t)(0x00);
+    }   
 
     // Write packets with 50ms gaps as per your B4J logic
     pRemoteCharacteristic->writeValue(byteONE, 1, false);

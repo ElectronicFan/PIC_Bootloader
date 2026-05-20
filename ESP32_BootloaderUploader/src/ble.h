@@ -18,5 +18,6 @@ void handleMessage(String msg, uint8_t* rawBytes, size_t len);
 extern NimBLEAdvertisedDevice* myDevice;                    // display_logic.cpp needs access to info
 extern NimBLERemoteCharacteristic* pRemoteCharacteristic;   // flash.cpp needs access to write
 extern uint16_t intMTUSize;
+extern uint8_t intVerifyTotalChecksum;
 
 #endif
