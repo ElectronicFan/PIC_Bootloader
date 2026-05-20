@@ -32,7 +32,7 @@ Version=9.85
 'Ctrl + click to export as zip: ide://run?File=%B4X%\Zipper.jar&Args=Project.zip
 
 Sub Class_Globals
-	Private Const VERSION As String = "12.53"
+	Private Const VERSION As String = "12.55"
 	
 	Private Const CONFIG_MAP As String = "config.map"		' For ESP32 Uploader
 	Private Const FLASH_BIN As String = "flash.bin"			' For ESP32 Uploader
@@ -1168,6 +1168,7 @@ Sub SendHandShakeBytes(WhichButton As Int, WhichDevice As Int)
 		Else
 			If blnToggle = False Then
 				' BLE
+				LogMessage("HANDSHAKE", "Sending: 0x55")
 				If WhichDevice = DEVICE_BLE Then
 					rs = bkHM10Client.Write(BLE_useUUID, b)
 					Wait For (rs) Complete (Result2 As PyWrapper)
@@ -1175,9 +1176,9 @@ Sub SendHandShakeBytes(WhichButton As Int, WhichDevice As Int)
 				Else
 					If astream.IsInitialized Then astream.Write(b)
 				End If
-				LogMessage("HANDSHAKE", "Sending: 0x55")
 			Else
 				' BLE
+				LogMessage("HANDSHAKE", "Sending: 0xAA")
 				If WhichDevice = DEVICE_BLE Then
 					rs = bkHM10Client.Write(BLE_useUUID, b2)
 					Wait For (rs) Complete (Result2 As PyWrapper)
@@ -1185,8 +1186,6 @@ Sub SendHandShakeBytes(WhichButton As Int, WhichDevice As Int)
 				Else
 					If astream.IsInitialized Then astream.Write(b2)
 				End If
-
-				LogMessage("HANDSHAKE", "Sending: 0xAA")
 			End If
 		End If
 				
@@ -1242,6 +1241,8 @@ Sub SendConfigBytes(WhichButton As Int, WhichDevice As Int)
 		End If
 	End If
 
+	LogMessage("CFG BYTES", "Sending: 0x" & Bit.ToHexString(byteONE(0)).ToUpperCase & ", " & "0x" & Bit.ToHexString(byteTWO(0)).ToUpperCase & ", " & "0x" & Bit.ToHexString(byteTHREE(0)).ToUpperCase& ", " & "0x" & Bit.ToHexString(byteFourth(0)).ToUpperCase)
+
 	' BLE
 	If WhichDevice = DEVICE_BLE Then
 		rs = bkHM10Client.Write(BLE_useUUID, byteONE)
@@ -1269,7 +1270,6 @@ Sub SendConfigBytes(WhichButton As Int, WhichDevice As Int)
 			Sleep(50)
 		End If
 	End If
-	LogMessage("CFG BYTES", "Sending: 0x" & Bit.ToHexString(byteONE(0)).ToUpperCase & ", " & "0x" & Bit.ToHexString(byteTWO(0)).ToUpperCase & ", " & "0x" & Bit.ToHexString(byteTHREE(0)).ToUpperCase& ", " & "0x" & Bit.ToHexString(byteFourth(0)).ToUpperCase)
 					
 	Do While myPicStatus.blnConfigOK = False
 		If isOperationFailed = True Then
@@ -1690,6 +1690,7 @@ Sub BytesToHexString2(b As Byte) As String
 	
 	Return byteString.ToUpperCase
 End Sub
+
 
 
 
