@@ -32,7 +32,7 @@ Version=9.85
 'Ctrl + click to export as zip: ide://run?File=%B4X%\Zipper.jar&Args=Project.zip
 
 Sub Class_Globals
-	Private Const VERSION As String = "12.55"
+	Private Const VERSION As String = "12.57"
 	
 	Private Const CONFIG_MAP As String = "config.map"		' For ESP32 Uploader
 	Private Const FLASH_BIN As String = "flash.bin"			' For ESP32 Uploader
@@ -245,7 +245,7 @@ Private Sub B4XPage_CloseRequest As ResumableSub
 	
 	' Flash in progress alert user!
 	If btnFlash.Text = txt_STOP Then
-		Dim sf4 As Object = xui.Msgbox2Async("Flash in progress!", "Quit?", "Yes", "", "No", Null)
+		Dim sf4 As Object = xui.Msgbox2Async("Flash in progress! Do you want to exit application?", "Quit?", "Yes", "", "No", Null)
 		Wait For (sf4) Msgbox_Result(ret3 As Int)
 				
 		If ret3 = xui.DialogResponse_Negative Then
