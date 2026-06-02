@@ -9,4 +9,5 @@ void disableFunction();
 
 extern unsigned long previousMillis;
 extern const long millisNoDelayValue;
+
 #endif

@@ -1,12 +1,17 @@
 #include "globals.h"
+#include "flash.h"
 #include "display_logic.h"
 #include "ble.h"
 #include "sdcard.h"
-#include "flash.h"
 
 MenuState currentMenu = MAIN;
 bool wasTouched = false;
 bool isFlashBtn_Visible = false;
+
+// Define the actual objects here (Allocation)
+TFT_eSPI tft = TFT_eSPI();                      // TFT instance (uses FSPI by default)
+XPT2046_Touchscreen touch(TOUCH_CS, TOUCH_IRQ); // CS and TIRQ pins for touch
+SPIClass touchSPI(HSPI);                        // Separate SPI bus for touch and SD card to avoid conflicts
 
 void initDisplaySystem() 
 {
@@ -324,7 +329,7 @@ void drawAboutMenu()
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
     tft.drawCentreString("ABOUT", 240, 20, 4);
     tft.drawString("Author: First Last", 5, 80, 2);
-    tft.drawString("Firmware: v2.19", 5, 100, 2);
+    tft.drawString("Firmware: v2.22", 5, 100, 2);
     tft.drawString("Product: PIC Uploader", 5, 120, 2);
     tft.drawString("Hardware: ESP32 + ILI9488 + SD", 5, 140, 2);
     drawBackButton();

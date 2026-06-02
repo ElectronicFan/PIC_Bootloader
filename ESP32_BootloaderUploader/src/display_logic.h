@@ -3,8 +3,6 @@
 
 #include <Arduino.h>
 
-enum MenuState { MAIN, FLASH, FIRMWARESTART, BT_CHECK, SYSTEM, ABOUT };
-
 // UI Prototypes
 void initDisplaySystem();
 void handleTouch();
@@ -32,6 +30,8 @@ void updateVerifyBytesLabel();
 void updateCriticalLabel(String msg, bool isSuccess) ;
 void ResetProgressBar();
 
-extern MenuState currentMenu;
+extern TFT_eSPI tft;                // (display_logic.cpp)
+extern XPT2046_Touchscreen touch;   // (display_logic.cpp, sdcard.cpp)
+extern SPIClass touchSPI;           // (display_logic.cpp, sdcard.cpp)  
 
 #endif

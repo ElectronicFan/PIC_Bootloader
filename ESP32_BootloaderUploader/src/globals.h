@@ -9,6 +9,8 @@
 
 #define SD_CS 21
 
+enum MenuState { MAIN, FLASH, FIRMWARESTART, BT_CHECK, SYSTEM, ABOUT };
+
 // .map configuration file
 struct ConfigMap {
     uint32_t intStartAddrFlash;
@@ -41,13 +43,8 @@ struct PicStatus {
     volatile bool blnEndFlashVerify = false;
 };
 
-// External references so other files can see them (main.cpp)
-extern TFT_eSPI tft;                // (display_logic.cpp)
-extern XPT2046_Touchscreen touch;   // (display_logic.cpp, sdcard.cpp)
-extern SPIClass touchSPI;           // (display_logic.cpp, sdcard.cpp)  
-
-
 extern ConfigMap myConfig;          // (sdcard.cpp)
 extern PicStatus myPicStatus;       // (flash.cpp)
+extern MenuState currentMenu;       // (display_logic.h)
 
 #endif

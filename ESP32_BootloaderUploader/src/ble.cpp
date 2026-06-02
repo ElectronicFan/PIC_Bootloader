@@ -1,20 +1,20 @@
 #include "globals.h"
-#include "ble.h"
 #include "display_logic.h"
 #include "sdcard.h"
-
-bool doConnect = false;
-bool doScan = true;
-String rxBufferString;
-File verifyFile;
-uint16_t intMTUSize = 20;                         
-uint8_t intVerifyTotalChecksum = 0;                            
-
+#include "ble.h"
+                          
 // Shared variables (extern from header)
 NimBLEAdvertisedDevice* myDevice = nullptr;
 NimBLERemoteCharacteristic* pRemoteCharacteristic = nullptr;
+uint16_t intMTUSize = 20;                         
+uint8_t intVerifyTotalChecksum = 0;  
 
 // Internal (file-local) variables
+File verifyFile;
+bool doConnect = false;
+bool doScan = true;
+String rxBufferString;
+
 static String targetDeviceName = "HM10";
 static NimBLEUUID serviceUUID("0000ffe0-0000-1000-8000-00805f9b34fb");    // HM-10 + HM-20 Service UUID
 static NimBLEUUID charUUID((uint16_t)0xFFE1);
@@ -298,6 +298,7 @@ void handleMessage(String msg, uint8_t* rawBytes, size_t length)
     // Check if we are in Verification Mode (we know this because PIC will start sending raw bytes instead of messages, but it will still send a message to trigger the start of verify mode)
     if (myPicStatus.blnStartFlashVerify == true) {
 
+        // This will treat checksum mode and byte count mode differently.  Checksum mode will just take the incoming bytes and add them to a total, then compare that total to the expected checksum at the end.  Byte count mode will count the number of bytes received and compare that to the expected byte count at the end.  In byte count mode, we also write the incoming bytes directly to a file on the SD card as they come in, so we don't have to keep them all in RAM, which is important since we are receiving them in chunks and they could be quite large.
         if (myConfig.blnUseCheckSum == true)
         {
             myPicStatus.blnStartFlashVerify = false;
@@ -305,7 +306,7 @@ void handleMessage(String msg, uint8_t* rawBytes, size_t length)
             {
                 intVerifyTotalChecksum = rawBytes[0];
             }
-
+        // This will check byte for byte and update the progress bar based on the total number of bytes received compared to the expected byte count.  It will also write the incoming bytes directly to a file on the SD card as they come in, so we don't have to keep them all in RAM, which is important since we are receiving them in chunks and they could be quite large.
         } else {
             myPicStatus.cntVerify += length;
 

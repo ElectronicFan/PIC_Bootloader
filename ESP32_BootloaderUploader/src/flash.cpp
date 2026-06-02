@@ -5,6 +5,7 @@
 #include "sdcard.h"
 
 PicStatus myPicStatus;
+
 const unsigned long INTERVAL_FLASH_DELAY = 20000;       // Minimum 20 seconds wait required when user cancels flash!        
 unsigned long previousMillis = -20000;                  // Set it to a matching negative-offset value to intervalFlashdelay. For initial startup!
 

@@ -1,13 +1,13 @@
 #include "globals.h"
-#include "sdcard.h"
 #include "display_logic.h"
+#include "sdcard.h"
 #include "ble.h"
 
 ConfigMap myConfig;
+
 const char* FLASH_FILE = "/flash.bin"; 
 const char* CONFIG_FILE = "/config.map";
 const char* VERIFY_FILE = "/verify.bin";    
-
 
 void initSDSystem() 
 {
@@ -27,7 +27,7 @@ void initSDSystem()
 
 void verifyStatus()
 {
-    if (compareFiles("/verify.bin", FLASH_FILE) == true)
+    if (compareFiles(VERIFY_FILE, FLASH_FILE) == true)
     {
         updateCriticalLabel("Passed!", true);
         Serial.println("File Success same!!!");
@@ -39,22 +39,7 @@ void verifyStatus()
 
 void verifyStatusCheckSum()
 {
-    File flashFile = SD.open(FLASH_FILE, FILE_READ);
-    if (!flashFile) 
-    {
-        Serial.println("Failed to open verify file for checksum!");
-        updateCriticalLabel("Verify file error!", false);
-        return;
-    }
-
-    uint8_t calculatedChecksum = 0;
-    while (flashFile.available()) 
-    {
-        calculatedChecksum += flashFile.read();
-    }
-    flashFile.close();
-
-    if (calculatedChecksum == intVerifyTotalChecksum) 
+  if (compareChecksum(VERIFY_FILE, intVerifyTotalChecksum) == true)
     {
         updateCriticalLabel("Passed!", true);
         Serial.println("Checksum Success!!!");
@@ -89,6 +74,30 @@ bool compareFiles(const char* path1, const char* path2)
     file1.close();
     file2.close();
     return true; // Files are identical
+}
+
+bool compareChecksum(const char* path, uint8_t expectedVerifyChecksum)
+{
+  File flashFile = SD.open(path, FILE_READ);
+    if (!flashFile) 
+    {
+        Serial.println("Failed to open verify file for checksum!");
+        return false;
+    }
+
+    uint8_t calculatedFileChecksum = 0;
+    while (flashFile.available()) 
+    {
+        calculatedFileChecksum += flashFile.read();
+    }
+    flashFile.close();
+
+    if (calculatedFileChecksum == expectedVerifyChecksum) 
+    {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 String GetConfigInfo() 

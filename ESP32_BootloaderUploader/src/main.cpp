@@ -4,7 +4,7 @@
  * HARDWARE: ESP32 + XPT2046 Touch + TFT Display + SD Card(Optional)
  * CONFIGURATION: Dual SPI (Separate Buses)
  * TFT9488 Seperate Bus. Touch2046/SD Card Shared Bus.
- * Version: 2.19
+ * Version: 2.22
  * =================================================================
 * * --- TFT DISPLAY (Bus 1: FSPI) ---
  * MOSI/SDI:   13                       -> Master Out Slave In
@@ -37,15 +37,10 @@
 
 // TFT and Touch Pins defined in Platformio.ini with -D flags (e.g. -D TOUCH_MOSI=4)
 
-// Define the actual objects here (Allocation)
-TFT_eSPI tft = TFT_eSPI();                      // TFT instance (uses FSPI by default)
-XPT2046_Touchscreen touch(TOUCH_CS, TOUCH_IRQ); // CS and TIRQ pins for touch
-SPIClass touchSPI(HSPI);                        // Separate SPI bus for touch and SD card to avoid conflicts
-
 void setup() 
 {
     Serial.begin(115200);
-    delay(2500);            // Good delay for the S3 USB Serial to catch up. Can remove if debugging not needed!
+    //delay(2500);            // Good delay for the S3 USB Serial to catch up. Can remove if debugging not needed!
 
     initDisplaySystem();    // Initializes TFT and Touchscreen
 
